@@ -13,7 +13,7 @@ object App {
         twitterStream.setOAuthAccessToken(accessToken)
         twitterStream.addListener(new MyStatusListener())
 
-        twitterStream.sample()
+        twitterStream.sample("ja")
     }
 }
 
