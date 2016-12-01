@@ -1,4 +1,4 @@
-package example
+package main
 
 import twitter4j.auth.AccessToken
 import twitter4j.{GeoLocation, Status, StatusListener, _}

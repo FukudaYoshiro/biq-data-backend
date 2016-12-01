@@ -17,4 +17,4 @@ libraryDependencies ++= Seq(
     "org.scalacheck" %% "scalacheck" % "1.11.5" % "test"
 )
 
-initialCommands := "import example._"
+initialCommands := "import main._"
