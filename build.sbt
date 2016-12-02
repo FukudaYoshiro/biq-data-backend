@@ -12,7 +12,7 @@ libraryDependencies ++= Seq(
     "org.twitter4j" % "twitter4j-core" % "4.0.4",
     "org.twitter4j" % "twitter4j-async" % "4.0.4",
     "org.twitter4j" % "twitter4j-stream" % "4.0.4",
-    "org.twitter4j" % "twitter4j-media-supsport" % "4.0.4",
+    "org.twitter4j" % "twitter4j-media-support" % "4.0.4",
     "org.scalatest" %% "scalatest" % "2.2.1" % "test",
     "org.scalacheck" %% "scalacheck" % "1.11.5" % "test"
 )
