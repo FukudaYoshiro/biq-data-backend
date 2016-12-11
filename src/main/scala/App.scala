@@ -6,6 +6,7 @@ import org.apache.spark.streaming.twitter._
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.StreamingContext._
 import org.apache.log4j.{Level, Logger}
+import org.atilika.kuromoji.{Token, Tokenizer}
 
 object App {
     def main(args: Array[String]): Unit = {
@@ -20,13 +21,13 @@ object App {
         System.setProperty("twitter4j.oauth.accessTokenSecret", config.get("twitter_accessTokenSecret").toString)
 
         // Create Stream
-        val filters = Array("Coffee", "Tea", "Alcohol")
         val sparkConf = new SparkConf().setAppName("TwitterPopularTags").setMaster("local[*]")
         val ssc = new StreamingContext(sparkConf, Seconds(2))
-        val stream = TwitterUtils.createStream(ssc, None, filters)
+        val stream = TwitterUtils.createStream(ssc, None)
+        val lanFilter = stream.filter(status => status.getUser().getLang == "ja")
 
         // Get RDD that has hashtags
-        val hashTags = stream.flatMap(status => status.getText.split(" ").filter(_.startsWith("#")))
+        val hashTags = lanFilter.flatMap(status => status.getText.split(" ").filter(_.startsWith("#")))
 
         // Get DStream
         val topCounts60 = hashTags.map((_, 1)).reduceByKeyAndWindow(_ + _, Seconds(60))
@@ -35,6 +36,7 @@ object App {
 
         val topCounts10 = hashTags.map((_, 1)).reduceByKeyAndWindow(_ + _, Seconds(10))
             .map{case (topic, count) => (count, topic)}
+
             .transform(_.sortByKey(false))
 
         // Print popular hashtags
