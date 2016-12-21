@@ -1,4 +1,4 @@
-name := "basic-project"
+name := "otkm"
 
 organization := "example"
 
