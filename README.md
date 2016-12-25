@@ -1,4 +1,4 @@
-# twitter-pulse
+# otsukimi
 twitterのトレンドワードをグラフ化するサービス
 
 # 機能
