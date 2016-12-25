@@ -38,13 +38,11 @@ object App {
 
             // ツイート本文の解析
             val tokens: java.util.List[Token] = tokenizer.tokenize(tweetText) // 形態素解析
-            val pattern: Pattern = Pattern.compile("^[a-zA-Z]+$|^[0-9]+$") //「英数字か？」の正規表現
             for (index <- 0 to tokens.size() - 1) {
                 //各形態素に対して。。。
                 val token = tokens.get(index)
-                val matcher: Matcher = pattern.matcher(token.getSurfaceForm())
-                // 文字数が3文字以上で、かつ、英数字のみではない単語を検索
-                if (token.getSurfaceForm().length() >= 3 && !matcher.find()) {
+                // 文字数が3文字以上検索
+                if (token.getSurfaceForm().length() >= 3) {
                     // 条件に一致した形態素解析の結果を登録
                     features += (token.getSurfaceForm())
                 }
