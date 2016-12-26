@@ -29,8 +29,8 @@ object App {
 
         // Twitterから取得したツイートを処理する
         val tweetStream = lanFilter.flatMap(status => {
-            val tokenizer: Tokenizer = Tokenizer.builder().build() // kuromojiの分析器
-            val features: scala.collection.mutable.ArrayBuffer[String] = new collection.mutable.ArrayBuffer[String]() //解析結果を保持するための入れ物
+            val tokenizer: Tokenizer = Tokenizer.builder().userDictionary("./dictionary/stopwords.csv").build()
+            val features: scala.collection.mutable.ArrayBuffer[String] = new collection.mutable.ArrayBuffer[String]()
             var tweetText: String = status.getText() //ツイート本文の取得
 
             // 不要な文字列の削除
@@ -41,8 +41,8 @@ object App {
             for (index <- 0 to tokens.size() - 1) {
                 //各形態素に対して。。。
                 val token = tokens.get(index)
-                // 文字数が3文字以上検索
-                if (token.getSurfaceForm().length() >= 3) {
+                // 文字数が3文字以上 & ユーザー辞書(無視する単語)にマッチしない
+                if (token.getSurfaceForm().length() >= 3 && !token.isUser()) {
                     // 条件に一致した形態素解析の結果を登録
                     features += (token.getSurfaceForm())
                 }
@@ -61,7 +61,7 @@ object App {
             // 出現回数上位20単語を取得
             val topList = rdd.take(20)
             // コマンドラインに出力
-            println("¥n Popular topics in last 60*60 seconds (%s words):".format(rdd.count()))
+            println("\n Popular topics in last 60*60 seconds (%s words):".format(rdd.count()))
             topList.foreach { case (count, tag) => println(s"$tag ($count tweets)") }
         })
 
