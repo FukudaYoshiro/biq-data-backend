@@ -42,7 +42,7 @@ object App {
                 //各形態素に対して。。。
                 val token = tokens.get(index)
                 // 文字数が3文字以上 & ユーザー辞書(無視する単語)にマッチしない
-                if (token.getSurfaceForm().length() >= 3 && !token.isUser()) {
+                if (token.getSurfaceForm().length() >= 3 && (!token.isUser() || !token.isKnown())) {
                     // 条件に一致した形態素解析の結果を登録
                     features += (token.getSurfaceForm())
                 }
