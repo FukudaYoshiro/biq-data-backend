@@ -29,7 +29,7 @@ object App {
 
         // Twitterから取得したツイートを処理する
         val tweetStream = lanFilter.flatMap(status => {
-            val tokenizer: Tokenizer = Tokenizer.builder().userDictionary("./dictionary/stopwords.csv").build()
+            val tokenizer: Tokenizer = Tokenizer.builder().build()
             val features: scala.collection.mutable.ArrayBuffer[String] = new collection.mutable.ArrayBuffer[String]()
             var tweetText: String = status.getText() //ツイート本文の取得
 
@@ -41,8 +41,8 @@ object App {
             for (index <- 0 to tokens.size() - 1) {
                 //各形態素に対して。。。
                 val token = tokens.get(index)
-                // 文字数が3文字以上 & ユーザー辞書(無視する単語)にマッチしない
-                if (token.getSurfaceForm().length() >= 3 && (!token.isUser() || !token.isKnown())) {
+                // 文字数が3文字以上
+                if (token.getSurfaceForm().length() >= 3) {
                     // 条件に一致した形態素解析の結果を登録
                     features += (token.getSurfaceForm())
                 }
