@@ -7,7 +7,6 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.StreamingContext._
 import org.apache.log4j.{Level, Logger}
 import org.atilika.kuromoji.{Token, Tokenizer}
-import java.util.regex._
 
 object App {
     def main(args: Array[String]): Unit = {
@@ -42,7 +41,7 @@ object App {
                 //各形態素に対して。。。
                 val token = tokens.get(index)
                 // 文字数が3文字以上
-                if (token.getSurfaceForm().length() >= 3) {
+                if (token.getSurfaceForm().length() >= 3 && Stopword.notContains(token.getSurfaceForm())) {
                     // 条件に一致した形態素解析の結果を登録
                     features += (token.getSurfaceForm())
                 }
