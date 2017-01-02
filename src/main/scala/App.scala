@@ -7,6 +7,9 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.StreamingContext._
 import org.apache.log4j.{Level, Logger}
 import org.atilika.kuromoji.{Token, Tokenizer}
+import java.sql.Connection
+import java.sql.Statement
+import org.apache.commons.dbcp2._
 
 object App {
     def main(args: Array[String]): Unit = {
@@ -25,6 +28,9 @@ object App {
         val ssc = new StreamingContext(sparkConf, Seconds(2))
         val stream = TwitterUtils.createStream(ssc, None)
         val lanFilter = stream.filter(status => status.getUser().getLang == "ja")
+        val connection = Datasource.connectionPool.getConnection
+        val stmt = connection.createStatement()
+        stmt.executeUpdate("INSERT INTO keywords (keyword, created_at, updated_at) VALUES ('foo', now(), now())")
 
         // Twitterから取得したツイートを処理する
         val tweetStream = lanFilter.flatMap(status => {
@@ -68,4 +74,16 @@ object App {
         ssc.start()
         ssc.awaitTermination()
     }
+}
+
+object Datasource {
+    val dbUrl = "jdbc:postgresql://localhost:5432/otsukimi"
+    val connectionPool = new BasicDataSource()
+
+    connectionPool.setUsername("ryota.murakami")
+    connectionPool.setPassword("")
+
+    connectionPool.setDriverClassName("org.postgresql.Driver")
+    connectionPool.setUrl(dbUrl)
+    connectionPool.setInitialSize(3)
 }
