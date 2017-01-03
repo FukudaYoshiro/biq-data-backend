@@ -30,7 +30,6 @@ object App {
         val lanFilter = stream.filter(status => status.getUser().getLang == "ja")
         val connection = Datasource.connectionPool.getConnection
         val stmt = connection.createStatement()
-        stmt.executeUpdate("INSERT INTO keywords (keyword, created_at, updated_at) VALUES ('foo', now(), now())")
 
         // Twitterから取得したツイートを処理する
         val tweetStream = lanFilter.flatMap(status => {
@@ -62,12 +61,46 @@ object App {
         }.transform(_.sortByKey(false)) // ソート
 
         // 出力
-        topCounts60.foreachRDD(rdd => {
-            // 出現回数上位20単語を取得
-            val topList = rdd.take(20)
+        topCounts60.foreachRDD(foreachFunc = rdd => {
+            // 出現回数上位100単語を取得
+            val topList = rdd.take(100)
             // コマンドラインに出力
             println("\n Popular topics in last 60*60 seconds (%s words):".format(rdd.count()))
-            topList.foreach { case (count, tag) => println(s"$tag ($count tweets)") }
+            topList.foreach {
+                case (count, tag) => {
+                    println(s"$tag ($count tweets)")
+                }
+            }
+            // DBにINSERTする形式にデータをマッピング
+            // [ranking_id,[[word, count], [word, count], [word, count]]
+
+            // rankingテーブルへINSERT,ranking_idを発行
+            stmt.executeUpdate("INSERT INTO rankings (created_at, updated_at) VALUES (now(), now())", Statement.RETURN_GENERATED_KEYS)
+            val rankingRes = stmt.executeQuery("SELECT id FROM rankings ORDER BY id DESC LIMIT 1")
+            rankingRes.next()
+            val rankingKey = rankingRes.getInt("id")
+
+            // keywordをkeyword_idに変換
+            topList.foreach {
+                case (count, tag) => {
+                    var insertMap = Map()
+                    // if keywordがdbに無ければ
+                    val keywordRes = stmt.executeQuery(s"SELECT id from keywords where keyword = $tag")
+                    println(keywordRes.next())
+                    if (keywordRes.first()) {
+                        // keywordsテーブルへINSERT
+                        stmt.executeUpdate(s"INSERT INTO keywords (keyword, created_at, updated_at) VALUES ($tag, now(), now())")
+                        val rs = stmt.getGeneratedKeys()
+                        if (rs.next()) {
+                            val keywordKey = rs.getInt(1)
+                        }
+                    }
+                    //                    insertListadd(key)
+                }
+            }
+
+            // ranking_itemsテーブルへranking_id, keyword_id, countをINSERT
+            stmt.executeUpdate("INSERT INTO ranking_items (keyword, count, created_at, updated_at) VALUES ('foo', now(), now())")
         })
 
         // 定義した処理を実行するSpark Streamingを起動！
