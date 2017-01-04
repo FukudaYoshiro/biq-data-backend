@@ -30,3 +30,14 @@ twitterのトレンドワードをグラフ化するサービス
 - 僕も@roprossさんや@fukayatsuさんや@yositosiさんや@yusukebeみたいになりたい
 - お金の香りがする http://oras-pokemon.com/?page_id=5332
 - 情報ボリューム全体の中でのマッピング位置を確認したい
+
+# SQL
+- 特定のranking_idのキーワードとカウントを取得する
+```
+select r.id, k.keyword, ri.count from (rankings r join ranking_items ri on r.id = ri.ranking_id) join keywords k on ri.keyword_id = k.id where r.id = 4239 order by ri.count desc;
+```
+
+- 全ranking_idのキーワードとカウントを集計する
+```
+select k.keyword, sum(ri.count) from (rankings r join ranking_items ri on r.id = ri.ranking_id) join keywords k on ri.keyword_id = k.id group by k.id,ri.count order by ri.count desc;
+```
