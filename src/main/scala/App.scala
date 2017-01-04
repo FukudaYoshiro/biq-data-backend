@@ -86,13 +86,14 @@ object App {
                 case (count, tag) =>
                     // if keywordがdbに無ければ
                     val keywordRes: ResultSet = stmt.executeQuery(s"SELECT id from keywords where keyword = '$tag'")
-                    if (keywordRes.next() == false) {
+                    if (keywordRes.next()){
+                        insertMap += keywordRes.getInt(1) -> count
+                    } else {
                         // keywordsテーブルへINSERT
                         stmt.executeUpdate(s"INSERT INTO keywords (keyword, created_at, updated_at) VALUES ('$tag', now(), now())")
                         val keywordIdRes = stmt.executeQuery("SELECT id FROM keywords ORDER BY id DESC LIMIT 1")
                         if (keywordIdRes.next()) {
-                            val keywordKey = keywordIdRes.getInt(1)
-                            insertMap += keywordKey -> count
+                            insertMap += keywordIdRes.getInt(1) -> count
                         }
                     }
             }
