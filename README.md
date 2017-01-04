@@ -39,5 +39,10 @@ select r.id, k.keyword, ri.count from (rankings r join ranking_items ri on r.id 
 
 - 全ranking_idのキーワードとカウントを集計する
 ```
-select k.keyword, sum(ri.count) from (rankings r join ranking_items ri on r.id = ri.ranking_id) join keywords k on ri.keyword_id = k.id group by k.id,ri.count order by ri.count desc;
+select k.keyword, sum(ri.count) from (rankings r join ranking_items ri on r.id = ri.ranking_id) join keywords k on ri.keyword_id = k.id group by k.id,ri.count order by sum(ri.count) desc;
+```
+
+- 直近30件のanking_idのキーワードとカウントを集計する
+```
+select k.keyword, sum(ri.count) from (rankings r join ranking_items ri on r.id = ri.ranking_id) join keywords k on ri.keyword_id = k.id where r.id in(select id from rankings order by id desc limit 30) group by k.id,ri.count order by sum(ri.count) desc;
 ```
