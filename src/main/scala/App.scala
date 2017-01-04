@@ -7,8 +7,8 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.StreamingContext._
 import org.apache.log4j.{Level, Logger}
 import org.atilika.kuromoji.{Token, Tokenizer}
-import java.sql.Connection
-import java.sql.Statement
+import java.sql.{Connection, ResultSet, Statement}
+
 import org.apache.commons.dbcp2._
 
 object App {
@@ -78,29 +78,29 @@ object App {
             stmt.executeUpdate("INSERT INTO rankings (created_at, updated_at) VALUES (now(), now())", Statement.RETURN_GENERATED_KEYS)
             val rankingRes = stmt.executeQuery("SELECT id FROM rankings ORDER BY id DESC LIMIT 1")
             rankingRes.next()
-            val rankingKey = rankingRes.getInt("id")
+            val rankingId = rankingRes.getInt("id")
 
+            var insertMap: scala.collection.mutable.Map[Int, Int] = scala.collection.mutable.Map()
             // keywordをkeyword_idに変換
             topList.foreach {
-                case (count, tag) => {
-                    var insertMap = Map()
+                case (count, tag) =>
                     // if keywordがdbに無ければ
-                    val keywordRes = stmt.executeQuery(s"SELECT id from keywords where keyword = $tag")
-                    println(keywordRes.next())
-                    if (keywordRes.first()) {
+                    val keywordRes: ResultSet = stmt.executeQuery(s"SELECT id from keywords where keyword = '$tag'")
+                    if (keywordRes.next() == false) {
                         // keywordsテーブルへINSERT
-                        stmt.executeUpdate(s"INSERT INTO keywords (keyword, created_at, updated_at) VALUES ($tag, now(), now())")
-                        val rs = stmt.getGeneratedKeys()
-                        if (rs.next()) {
-                            val keywordKey = rs.getInt(1)
+                        stmt.executeUpdate(s"INSERT INTO keywords (keyword, created_at, updated_at) VALUES ('$tag', now(), now())")
+                        val keywordIdRes = stmt.executeQuery("SELECT id FROM keywords ORDER BY id DESC LIMIT 1")
+                        if (keywordIdRes.next()) {
+                            val keywordKey = keywordIdRes.getInt(1)
+                            insertMap += keywordKey -> count
                         }
                     }
-                    //                    insertListadd(key)
-                }
             }
-
             // ranking_itemsテーブルへranking_id, keyword_id, countをINSERT
-            stmt.executeUpdate("INSERT INTO ranking_items (keyword, count, created_at, updated_at) VALUES ('foo', now(), now())")
+            insertMap.foreach {
+                case (keywordId, count) =>
+                    stmt.executeUpdate(s"INSERT INTO ranking_items (ranking_id, keyword_id, count, created_at, updated_at) VALUES ($rankingId, $keywordId, $count, now(), now())")
+            }
         })
 
         // 定義した処理を実行するSpark Streamingを起動！
