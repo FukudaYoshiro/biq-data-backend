@@ -40,7 +40,7 @@ object App {
             // 不要な文字列の削除
             tweetText = tweetText
                 .replaceAll("http(s*)://(.*)/", "")
-                .replaceAll("¥¥uff57", "") // 全角の「ｗ」は邪魔www
+                .replaceAll("\\uff57", "") // 全角の「ｗ」は邪魔www
                 .replaceAll("\\p{javaWhitespace}", "") // 空白文字
 
             // ツイート本文の解析
