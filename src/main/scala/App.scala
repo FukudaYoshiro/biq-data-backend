@@ -92,7 +92,7 @@ object App {
                 case (count, tag) =>
                     // if keywordがdbに無ければ
                     val keywordRes: ResultSet = stmt.executeQuery(s"SELECT id from keywords where keyword = '$tag'")
-                    if (keywordRes.next()){
+                    if (keywordRes.next()) {
                         insertMap += keywordRes.getInt(1) -> count
                     } else {
                         // keywordsテーブルへINSERT
