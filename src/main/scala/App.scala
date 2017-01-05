@@ -77,8 +77,11 @@ object App {
             // rankingテーブルへINSERT,ranking_idを発行
             stmt.executeUpdate("INSERT INTO rankings (created_at, updated_at) VALUES (now(), now())", Statement.RETURN_GENERATED_KEYS)
             val rankingRes = stmt.executeQuery("SELECT id FROM rankings ORDER BY id DESC LIMIT 1")
-            rankingRes.next()
-            val rankingId = rankingRes.getInt("id")
+
+            var rankingId :Int = 0
+            if (rankingRes.next()) {
+                rankingId = rankingRes.getInt("id")
+            }
 
             var insertMap: scala.collection.mutable.Map[Int, Int] = scala.collection.mutable.Map()
             // keywordをkeyword_idに変換
