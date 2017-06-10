@@ -117,7 +117,7 @@ object App {
 }
 
 object Datasource {
-    val dbUrl = "jdbc:postgresql://localhost:5432/otsukimi"
+    val dbUrl = "jdbc:postgresql://localhost:5432/streambiqdata"
     val connectionPool = new BasicDataSource()
 
     connectionPool.setUsername("ryota.murakami")
