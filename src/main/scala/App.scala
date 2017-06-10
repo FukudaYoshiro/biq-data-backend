@@ -55,7 +55,7 @@ object App {
             features
         })
 
-        // ウインドウ集計（行末の括弧の位置はコメントを入れるためです、気にしないで下さい。）
+        // ウインドウ集計
         val topCounts60 = tweetStream.map((_, 1) // 出現回数をカウントするために各単語に「1」を付与
         ).reduceByKeyAndWindow(_ + _, Seconds(60) // ウインドウ幅(60sec)に含まれる単語を集める
         ).map { case (topic, count) => (count, topic) // 単語の出現回数を集計
