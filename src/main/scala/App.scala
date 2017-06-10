@@ -16,12 +16,10 @@ object App {
         Logger.getLogger("org").setLevel(Level.OFF)
 
         // Set Twitter Access Keys
-        val config = new java.util.Properties
-        config.load(this.getClass().getClassLoader().getResourceAsStream("config.properties"))
-        System.setProperty("twitter4j.oauth.consumerKey", config.get("twitter_consumerKey").toString)
-        System.setProperty("twitter4j.oauth.consumerSecret", config.get("twitter_consumerSecret").toString)
-        System.setProperty("twitter4j.oauth.accessToken", config.get("twitter_accessToken").toString)
-        System.setProperty("twitter4j.oauth.accessTokenSecret", config.get("twitter_accessTokenSecret").toString)
+        System.setProperty("twitter4j.oauth.consumerKey", "rwcbIdCTJZ91ROpA0yluLtCPB")
+        System.setProperty("twitter4j.oauth.consumerSecret", "CZixZElCoi7QhJBhX9NJjIOFYWCtZHa9QCS3x3gDlafgZFl8XY")
+        System.setProperty("twitter4j.oauth.accessToken", "1664570156-F87N3fRARijyELtu9bM6eAljzxEgvxZiWQrHiik")
+        System.setProperty("twitter4j.oauth.accessTokenSecret", "bFXFwFHMb9FO4n4bkPb0xiiZ7XlZbfFNfjhUiQ1sE0rcK")
 
         // Create Stream
         val sparkConf = new SparkConf().setAppName("TwitterPopularTags").setMaster("local[*]")
